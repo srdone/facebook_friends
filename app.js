@@ -1,10 +1,14 @@
 (function myDataGenerator () {
 	var data;
 
-	function getData(query) {
-		alert(query);
-	};
+	var getDataButton = $('#getData').click(getData);
 
-	getData('Hi');
+	function getData() {
+
+		var email = $('#username').val();
+		var password = $('#password').val();
+
+		alert(email + password);
+	};
 
 }());
