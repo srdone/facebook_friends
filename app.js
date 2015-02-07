@@ -1,40 +1,48 @@
 $(document).ready(function myDataGenerator () {
 
-	var button = $('#getData');
+	var nextData = '';
 
-	var getData = function () {
+	var display = $('#dataviz')
+
+	var getFriends = function () {
 
 		var token = $('#token').val();
 
-		var getLikes = function () {
-			$.ajax({
-				method: 'GET',
-				url: 'https://graph.facebook.com/v2.2/me/likes?access_token=' + token
-			})
-			.done(function (data) {
-				console.log(data.data);
-				$('#dataviz').append('<p>The first page of likes that Facebook returned was:</p>');
-				data.data.forEach(function(c) {
-					$('#dataviz').append('<p>' + c.name + '</p>');
-				});
-			});
-		};
-
-		var getFriends = function () {
-			$.ajax({
-				method: 'GET',
-				url: 'https://graph.facebook.com/v2.2/me/friends?access_token=' + token + '&format=json&method=get&pretty=0&suppress_http_code=1'
-			})
-			.done(function (data) {
-				$('#dataviz').append('<p>You have ' + data.summary.total_count + ' friends on facebook</p>');
-				setTimeout(getLikes(), 1);
-			});
-		};
-
-		getFriends();
-
+		$.ajax({
+			method: 'GET',
+			url: 'https://graph.facebook.com/v2.2/me/friends?access_token=' + token + '&format=json&method=get&pretty=0&suppress_http_code=1'
+		})
+		.done(function (data) {
+			display.html('');
+			display.append('<p>You have ' + data.summary.total_count + ' friends on facebook</p>');
+		});
 	};
 
-	button.click(getData);
+	var getLikes = function () {
+
+		var token = $('#token').val();
+
+		var nextUrl = nextData || 'https://graph.facebook.com/v2.2/me/likes?fields=name&access_token=' + token;
+
+		$.ajax({
+			method: 'GET',
+			url: nextUrl
+		})
+		.done(function (data) {
+			display.html('');
+			display.append('<p>The page of likes that Facebook returned was:</p>');
+			data.data.forEach(function(c) {
+				display.append('<p>' + c.name + '</p>');
+			});
+			if(data.paging.next) {
+				nextData = data.paging.next;
+				console.log(nextData);
+				$('#getLikes').text('Get Next Page');
+			}
+		});
+	};
+
+	$('#getFriendCount').click(getFriends);
+	$('#getLikes').click(getLikes);
 
 });
