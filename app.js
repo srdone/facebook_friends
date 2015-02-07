@@ -1,14 +1,24 @@
-(function myDataGenerator () {
-	var data;
+$(document).ready(function myDataGenerator () {
 
-	var getDataButton = $('#getData').click(getData);
+	var button = $('#getData');
 
-	function getData() {
+	var getData = function () {
+		debugger;
+		var token = $('#token').val();
 
-		var email = $('#username').val();
-		var password = $('#password').val();
+		alert(token);
 
-		alert(email + password);
+		$.ajax({
+			method: 'GET',
+			url: 'https://graph.facebook.com/v2.2/me/friends?access_token=' + token + '&format=json&method=get&pretty=0&suppress_http_code=1'
+		}).done(postData);
+
 	};
 
-}());
+	var postData = function (data) {
+		$('#dataviz').text(data.summary.total_count);
+	};
+
+	button.click(getData);
+
+});
